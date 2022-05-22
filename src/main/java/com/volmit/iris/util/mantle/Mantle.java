@@ -20,6 +20,7 @@ package com.volmit.iris.util.mantle;
 
 import com.volmit.iris.Iris;
 import com.volmit.iris.core.IrisSettings;
+import com.volmit.iris.core.tools.IrisToolbelt;
 import com.volmit.iris.engine.data.cache.Cache;
 import com.volmit.iris.engine.framework.Engine;
 import com.volmit.iris.engine.mantle.EngineMantle;
@@ -329,7 +330,7 @@ public class Mantle {
     }
 
     /**
-     * Gets the data tat the current block position This method will attempt to find a
+     * Gets the data at the current block position This method will attempt to find a
      * Tectonic Plate either by loading it or creating a new one. This method uses
      * the hyper lock packaged with each Mantle. The hyperlock allows locking of multiple
      * threads at a single region while still allowing other threads to continue
@@ -376,6 +377,14 @@ public class Mantle {
      */
     public boolean isClosed() {
         return closed.get();
+    }
+
+    public void set(int x, int y, int z, Matter matter)
+    {
+        for(MatterSlice<?> i : matter.getSliceMap().values())
+        {
+            i.iterate((mx, my, mz, v) -> set(mx + x, my + y, mz + z, v));
+        }
     }
 
     /**
@@ -570,6 +579,11 @@ public class Mantle {
     }
 
     public void deleteChunkSlice(int x, int z, Class<?> c) {
+        if(!IrisToolbelt.toolbeltConfiguration.isEmpty() && IrisToolbelt.toolbeltConfiguration.getOrDefault("retain.mantle." + c.getCanonicalName(), false))
+        {
+            return;
+        }
+
         getChunk(x, z).deleteSlices(c);
     }
 

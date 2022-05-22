@@ -32,15 +32,21 @@ import com.volmit.iris.engine.platform.PlatformChunkGenerator;
 import com.volmit.iris.util.plugin.VolmitSender;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 
 import java.io.File;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Something you really want to wear if working on Iris. Shit gets pretty hectic down there.
  * Hope you packed snacks & road sodas.
  */
 public class IrisToolbelt {
+    public static Map<String, Boolean> toolbeltConfiguration = new HashMap<>();
+
     /**
      * Will find / download / search for the dimension or return null
      * <p>
@@ -110,8 +116,24 @@ public class IrisToolbelt {
     public static PlatformChunkGenerator access(World world) {
         if(isIrisWorld(world)) {
             return ((PlatformChunkGenerator) world.getGenerator());
-        }
-
+        } /*else {
+            Iris.warn("""
+                    "---------- No World? ---------------
+                    ⠀⣞⢽⢪⢣⢣⢣⢫⡺⡵⣝⡮⣗⢷⢽⢽⢽⣮⡷⡽⣜⣜⢮⢺⣜⢷⢽⢝⡽⣝
+                    ⠸⡸⠜⠕⠕⠁⢁⢇⢏⢽⢺⣪⡳⡝⣎⣏⢯⢞⡿⣟⣷⣳⢯⡷⣽⢽⢯⣳⣫⠇
+                    ⠀⠀⢀⢀⢄⢬⢪⡪⡎⣆⡈⠚⠜⠕⠇⠗⠝⢕⢯⢫⣞⣯⣿⣻⡽⣏⢗⣗⠏⠀
+                    ⠀⠪⡪⡪⣪⢪⢺⢸⢢⢓⢆⢤⢀⠀⠀⠀⠀⠈⢊⢞⡾⣿⡯⣏⢮⠷⠁⠀⠀
+                    ⠀⠀⠀⠈⠊⠆⡃⠕⢕⢇⢇⢇⢇⢇⢏⢎⢎⢆⢄⠀⢑⣽⣿⢝⠲⠉⠀⠀⠀⠀
+                    ⠀⠀⠀⠀⠀⡿⠂⠠⠀⡇⢇⠕⢈⣀⠀⠁⠡⠣⡣⡫⣂⣿⠯⢪⠰⠂⠀⠀⠀⠀
+                    ⠀⠀⠀⠀⡦⡙⡂⢀⢤⢣⠣⡈⣾⡃⠠⠄⠀⡄⢱⣌⣶⢏⢊⠂⠀⠀⠀⠀⠀⠀
+                    ⠀⠀⠀⠀⢝⡲⣜⡮⡏⢎⢌⢂⠙⠢⠐⢀⢘⢵⣽⣿⡿⠁⠁⠀⠀⠀⠀⠀⠀⠀
+                    ⠀⠀⠀⠀⠨⣺⡺⡕⡕⡱⡑⡆⡕⡅⡕⡜⡼⢽⡻⠏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                    ⠀⠀⠀⠀⣼⣳⣫⣾⣵⣗⡵⡱⡡⢣⢑⢕⢜⢕⡝⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                    ⠀⠀⠀⣴⣿⣾⣿⣿⣿⡿⡽⡑⢌⠪⡢⡣⣣⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                    ⠀⠀⠀⡟⡾⣿⢿⢿⢵⣽⣾⣼⣘⢸⢸⣞⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                    ⠀⠀⠀⠀⠁⠇⠡⠩⡫⢿⣝⡻⡮⣒⢽⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+                    """);
+        }*/
         return null;
     }
 
@@ -209,5 +231,24 @@ public class IrisToolbelt {
 
     public static boolean isStudio(World i) {
         return isIrisWorld(i) && access(i).isStudio();
+    }
+
+    public static void retainMantleDataForSlice(String className)
+    {
+        toolbeltConfiguration.put("retain.mantle." + className, true);
+    }
+
+    public static <T> T getMantleData(World world, int x, int y, int z, Class<T> of)
+    {
+        PlatformChunkGenerator e = access(world);
+        if(e == null) {return null;}
+        return e.getEngine().getMantle().getMantle().get(x, y - world.getMinHeight(), z, of);
+    }
+
+    public static <T> void  deleteMantleData(World world, int x, int y, int z, Class<T> of)
+    {
+        PlatformChunkGenerator e = access(world);
+        if(e == null) {return;}
+        e.getEngine().getMantle().getMantle().remove(x, y - world.getMinHeight(), z, of);
     }
 }
